@@ -1,0 +1,76 @@
+crawler:
+  subreddits:
+    - SaaS
+    - startups
+    - Entrepreneur
+    - smallbusiness
+    - microsaas
+    - sideproject
+    - freelance
+    - ecommerce
+    - shopify
+    - marketing
+    - sales
+    - accounting
+    - realestate
+    - productivity
+    - webdev
+
+  search_queries:
+    - "looking for a tool"
+    - "alternative to"
+    - "I hate"
+    - "frustrated"
+    - "annoying"
+    - "manual"
+    - "workaround"
+    - "wish there was"
+    - "can't find"
+    - "too expensive"
+    - "too complicated"
+    - "waste of time"
+    - "how do you manage"
+    - "looking for software"
+    - "is there a tool"
+    - "how do you automate"
+
+  default_limit_per_sub: 200
+  default_days: 30
+  max_comments_per_post: 25
+  delay_seconds: 1.2
+  concurrency: 3
+  headless: true
+
+cerebras:
+  model: "qwen-3.8-27b"
+  temperature: 0.1
+  max_tokens: 3000
+  timeout_seconds: 35
+  concurrency: 4
+  max_retries: 3
+  backoff_factor: 1.5
+
+storage:
+  sqlite_path: "data/reddit_pain_radar.db"
+  raw_posts_jsonl: "data/raw/posts.jsonl"
+  raw_comments_jsonl: "data/raw/comments.jsonl"
+
+clustering:
+  embedding_model: "all-MiniLM-L6-v2"
+  distance_threshold: 0.58
+  min_cluster_size: 2
+
+scoring_weights:
+  frequency: 0.25
+  unique_discussions: 0.15
+  subreddit_diversity: 0.10
+  engagement: 0.10
+  recency: 0.10
+  growth: 0.10
+  workaround_intensity: 0.10
+  existing_solution_dissatisfaction: 0.05
+  purchase_switching_signals: 0.05
+
+reports:
+  output_dir: "reports"
+  top_n: 15
