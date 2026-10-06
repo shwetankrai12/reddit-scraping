@@ -13,7 +13,28 @@ logger = logging.getLogger(__name__)
 
 PASS1_SYSTEM_PROMPT = """You are an objective, evidence-backed problem discovery engine analyzing real Reddit posts and comments.
 Your goal is NOT to brainstorm startup ideas or invent hypothetical solutions.
-Your mission is to rigorously evaluate whether the text describes a REAL, REPEATED, PAINFUL PROBLEM experienced by an actual person.
+Your mission is to evaluate whether the text describes a REAL, REPEATED, PAINFUL PROBLEM experienced by an actual person.
+
+CRITICAL: NEVER PRODUCE GENERIC PROBLEM STATEMENTS!
+BANNED GENERIC STATEMENTS:
+- "Users struggle with manual work."
+- "SaaS founders have difficulty with marketing."
+- "Businesses face operational overhead."
+- "Businesses struggle with invoicing."
+- "Founders struggle with marketing."
+
+Every problem_statement MUST strictly contain:
+1. WHO has the problem (specific target persona, e.g., 'Small businesses', 'Early-stage SaaS founders', 'Freelance designers')
+2. WHAT exact task/problem they experience (the specific operational task or workflow friction)
+3. WHAT makes the current solution inadequate (why existing tools or manual workarounds break or fail)
+
+EXAMPLES:
+- Bad: "Businesses struggle with invoicing."
+  Good: "Small businesses manually reconcile invoices and payments across banking and accounting tools because automated integrations drop multi-currency fee breakdowns."
+- Bad: "Founders struggle with marketing."
+  Good: "Early-stage SaaS founders manually combine prospect research, email discovery, personalization and Gmail to run cold outreach because all-in-one platforms are cost-prohibitive."
+- Bad: "Agencies have operational issues."
+  Good: "Web development agencies manually chase client approvals across scattered WhatsApp and email threads because current portals lack external sign-off links."
 
 STRONG SIGNALS:
 - "I spend 3 hours every week doing this manually"
@@ -40,7 +61,7 @@ Respond with a SINGLE, RAW, VALID JSON object matching this exact schema:
   "purchase_signal": false,
   "switching_signal": false,
   "problem_type": "manual_work",
-  "problem_statement": "A concise, objective 1-sentence statement of the underlying problem.",
+  "problem_statement": "Specific statement containing 1) WHO, 2) WHAT exact task/problem, and 3) WHAT makes current solution inadequate.",
   "target_user": "Specific persona (e.g. 'Small agency owners', 'E-commerce store managers')",
   "current_workaround": "The specific manual method, tool combination, or process they use today",
   "why_painful": "Concrete reasons (wasted hours, financial loss, high churn, errors)",
@@ -53,6 +74,7 @@ Do NOT output markdown code blocks (```json) or introductory commentary. Output 
 """
 
 REPAIR_SYSTEM_PROMPT = """You are a JSON repair tool. You take raw text or broken JSON and output ONLY a single valid JSON object strictly matching the required schema. No commentary, no code fences.
+Ensure problem_statement is specific: must state 1) WHO has the problem, 2) WHAT exact task/problem, and 3) WHAT makes current solution inadequate. Never output generic phrases like 'Users struggle with manual work'.
 Required fields: is_real_problem (bool), pain_level (int 1-5), recurring_problem (bool), manual_workaround (bool), existing_solution_failure (bool), purchase_signal (bool), switching_signal (bool), problem_type (str), problem_statement (str), target_user (str), current_workaround (str), why_painful (str), confidence (float 0-1).
 """
 

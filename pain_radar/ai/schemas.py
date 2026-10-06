@@ -73,6 +73,39 @@ class PainSignalSchema(BaseModel):
         description="Confidence score between 0.0 and 1.0."
     )
 
+    @field_validator("problem_statement")
+    @classmethod
+    def validate_problem_statement(cls, v: str) -> str:
+        s = v.strip()
+        lower = s.lower()
+        generic_patterns = [
+            "users struggle with manual work",
+            "businesses face operational overhead",
+            "founders have difficulty with marketing",
+            "businesses struggle with invoicing",
+            "founders struggle with marketing",
+            "struggle with manual work",
+            "difficulty with marketing",
+            "face operational overhead",
+            "struggle with invoicing",
+            "incomplete input",
+            "problem details unavailable",
+            "manual operational overhead consuming excessive",
+            "insufficient information",
+            "unreliable behavior that causes recurring",
+            "missing required problem fields",
+        ]
+        for pat in generic_patterns:
+            if pat in lower:
+                raise ValueError(
+                    f"Problem statement '{s}' is too generic. Must specify: 1) WHO has the problem, 2) WHAT exact task/problem they experience, and 3) WHAT makes the current solution inadequate."
+                )
+        if len(s) < 25:
+            raise ValueError(
+                f"Problem statement '{s}' is too short/generic. Must specify WHO, WHAT exact task, and WHAT makes current solution inadequate."
+            )
+        return s
+
     @field_validator("pain_level", mode="before")
     @classmethod
     def clamp_pain_level(cls, v):
@@ -125,3 +158,36 @@ class OpportunitySynthesisSchema(BaseModel):
         default_factory=list,
         description="Potential execution risks or market challenges."
     )
+
+    @field_validator("problem_summary")
+    @classmethod
+    def validate_problem_summary(cls, v: str) -> str:
+        s = v.strip()
+        lower = s.lower()
+        generic_patterns = [
+            "users struggle with manual work",
+            "businesses face operational overhead",
+            "founders have difficulty with marketing",
+            "businesses struggle with invoicing",
+            "founders struggle with marketing",
+            "struggle with manual work",
+            "difficulty with marketing",
+            "face operational overhead",
+            "struggle with invoicing",
+            "incomplete input",
+            "problem details unavailable",
+            "manual operational overhead consuming excessive",
+            "insufficient information",
+            "unreliable behavior that causes recurring",
+            "missing required problem fields",
+        ]
+        for pat in generic_patterns:
+            if pat in lower:
+                raise ValueError(
+                    f"Problem summary '{s}' is too generic. Must specify: 1) WHO has the problem, 2) WHAT exact task/problem they experience, and 3) WHAT makes the current solution inadequate."
+                )
+        if len(s) < 25:
+            raise ValueError(
+                f"Problem summary '{s}' is too short/generic. Must specify WHO, WHAT exact task, and WHAT makes current solution inadequate."
+            )
+        return s

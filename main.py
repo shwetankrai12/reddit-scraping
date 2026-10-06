@@ -86,6 +86,19 @@ def cmd_score(args: argparse.Namespace) -> None:
     print(f"\nScoring complete. Scored {len(scored)} clusters.")
 
 
+def cmd_synthesize(args: argparse.Namespace) -> None:
+    db = get_db()
+    if args.mock_ai:
+        config.mock_mode = True
+    else:
+        config.validate_cerebras()
+    client = CerebrasClient(config)
+    synthesizer = Pass2Synthesizer(db, client)
+    top_n = args.top or config.reports_top_n
+    synthesizer.synthesize_top_clusters(top_n=top_n)
+    print(f"\nSynthesis complete for top {top_n} clusters.")
+
+
 def cmd_report(args: argparse.Namespace) -> None:
     db = get_db()
     reporter = ReportGenerator(db, output_dir=config.reports_dir, top_n=args.top or config.reports_top_n)
@@ -198,6 +211,11 @@ def main() -> None:
     p_score = subparsers.add_parser("score", help="Compute deterministic opportunity scores")
     p_score.add_argument("--days", type=int, default=30, help="Time window for trends")
 
+    # Synthesize
+    p_synthesize = subparsers.add_parser("synthesize", help="Synthesize problem clusters using Cerebras Qwen")
+    p_synthesize.add_argument("--top", type=int, default=15, help="Number of top clusters to synthesize")
+    p_synthesize.add_argument("--mock-ai", action="store_true", help="Use offline mock AI responses")
+
     # Report
     p_report = subparsers.add_parser("report", help="Generate Markdown, CSV, and JSON reports")
     p_report.add_argument("--top", type=int, default=15, help="Number of top problems to include")
@@ -221,6 +239,8 @@ def main() -> None:
         cmd_cluster(args)
     elif args.command == "score":
         cmd_score(args)
+    elif args.command == "synthesize":
+        cmd_synthesize(args)
     elif args.command == "report":
         cmd_report(args)
     elif args.command == "run":
