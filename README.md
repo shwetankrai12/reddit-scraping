@@ -80,8 +80,8 @@ Reddit (Public Web)
 ### 1. Clone & Set Up Virtual Environment
 
 ```bash
-git clone https://github.com/Shayanghosh03/VORTEX_AI.git
-cd VORTEX_AI
+git clone https://github.com/shwetankrai12/reddit-scraping.git
+cd reddit-scraping
 
 # Create virtual environment
 python -m venv .venv
